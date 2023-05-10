@@ -1,0 +1,41 @@
+{
+    "if_directory_empty": "download_last",
+    "podcasts": [
+        {
+            "name": "Your First Home Buyer Guide Podcast",
+            "rss_link": "https://www.omnycontent.com/d/playlist/3c72444b-621f-4a3e-b6e1-a82000673c2f/52a142e1-0905-48a3-9586-ac91001d6222/e3f25be2-d0d8-4aae-a501-ac91002373ff/podcast.rss",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/first_home_buyer_guide",
+            "file_name_template": "%title%.%file_extension%"
+        },
+        {
+            "name": "My Millenial Property",
+            "rss_link": "https://feeds.acast.com/public/shows/62fa0d8926f5af001280299c",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/my_millenial_property",
+            "file_name_template": "%title%.%file_extension%"
+        },
+        {
+            "name": "Your Strata Property",
+            "rss_link": "https://www.yourstrataproperty.com.au/feed/podcast/",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/your_strata_property",
+            "file_name_template": "%title%.%file_extension%"
+        },
+        {
+            "name": "The Home Run",
+            "rss_link": "https://omny.fm/shows/the-home-run/playlists/podcast.rss",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/the_home_run",
+            "file_name_template": "%title%.%file_extension%"
+        },
+        {
+            "name": "The Elephant in the Room Property Podcast",
+            "rss_link": "https://www.omnycontent.com/d/playlist/3c72444b-621f-4a3e-b6e1-a82000673c2f/469eaf17-e0b5-4a92-94c3-ad8e001a1506/92ba93e7-629e-4c65-bffa-ad8e001a151e/podcast.rss",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/the_elephant_in_the_room_property_podcast",
+            "file_name_template": "%title%.%file_extension%"
+        },
+        {
+            "name": "Australian Property Podcast",
+            "rss_link": "https://feeds.megaphone.fm/australian-property-podcast",
+            "path": "/Users/samhardyhey/Desktop/blog/amy-lunardi-podcast-thing/podcasts/australian_property_podcast",
+            "file_name_template": "%title%.%file_extension%"
+        }
+    ]
+}

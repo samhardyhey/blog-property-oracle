@@ -1,8 +1,8 @@
 import os
 
 import pandas as pd
-from langchain.chains import VectorDBQA
-from langchain.document_loaders import DataFrameLoader, TextLoader
+from dotenv import load_dotenv
+from langchain.document_loaders import DataFrameLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,6 +10,7 @@ from langchain.vectorstores import Chroma
 
 from transcribe import transcript_dir
 
+load_dotenv()
 transcript_col = "text"
 embedding_function = OpenAIEmbeddings(openai_api_key=os.environ["OPEN_API_KEY"])
 llm = OpenAI(openai_api_key=os.environ["OPEN_API_KEY"])
@@ -61,19 +62,29 @@ def estimate_cost_of_ingest(transcript_df):
 def ingest_transcript_df(transcript_df):
     # TODO: add upsert, prevent redundant writes
     documents = DataFrameLoader(
-        transcript_df.head(20), page_content_column=transcript_col
+        transcript_df, page_content_column=transcript_col
     ).load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     texts = text_splitter.split_documents(documents)
     # embed, write to chroma, save chroma db
+    # source_meta_data = transcript_df[["source"]].to_dict(orient="records")
     vectordb.add_documents(texts)
+    # vectordb.from_texts(texts, embedding_function)
     vectordb.persist()
 
 
 if __name__ == "__main__":
     for transcript in list(transcript_dir.rglob("*/*.csv")):
-        transcript_df = parse_transcript(transcript).assign(
-            podcast=transcript.parent.name
+        transcript_df = (
+            parse_transcript(transcript)
+            .assign(podcast=transcript.parent.name)
+            .assign(episode=transcript.stem)
+            # for QA with sources
+            .assign(
+                source=lambda x: x.apply(
+                    lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1
+                )
+            )
         )
         print(f"Ingesting transcript: {transcript.name}")
         estimate_cost_of_ingest(transcript_df)

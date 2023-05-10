@@ -1,5 +1,9 @@
 db/
 transcripts/
 podcasts/
+*.mp3
+*.csv
 data/
 .env
+*.pyc
+__pycache__/

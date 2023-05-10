@@ -17,7 +17,9 @@ def transcribe_audio(audio_file):
     transcript = []
     for segment in segments:
         print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
-        transcript.append({"start": segment.start, "end": segment.end, "text": segment.text})
+        transcript.append(
+            {"start": segment.start, "end": segment.end, "text": segment.text}
+        )
     return pd.DataFrame(transcript)
 
 

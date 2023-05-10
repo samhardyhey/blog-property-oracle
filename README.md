@@ -1,3 +1,8 @@
+# TODO:
+- open source alternatives for everything?
+- GPU integration > S3 bucket for storage
+- Hosted vector DB
+
 ## Podcast downloaders
 - python module: https://github.com/dplocki/podcast-downloader
 - turn a google podcast feed into an RSS feed: https://getrssfeed.com/
