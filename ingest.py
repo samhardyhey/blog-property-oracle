@@ -1,12 +1,5 @@
-import os
-
 import pandas as pd
 from dotenv import load_dotenv
-from langchain.document_loaders import DataFrameLoader
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.llms import OpenAI
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
 
 from transcribe import transcript_dir
 
@@ -26,7 +19,11 @@ def merge_adjacent_utterances(df):
             # Remove the next record from the dataframe
             df.drop(_, inplace=True)
         merged_records.append(row)
-    return pd.DataFrame(merged_records).drop(columns=["delta", "merge"]).reset_index(drop=True)
+    return (
+        pd.DataFrame(merged_records)
+        .drop(columns=["delta", "merge"])
+        .reset_index(drop=True)
+    )
 
 
 def parse_transcript(transcript_file):
@@ -56,7 +53,11 @@ if __name__ == "__main__":
             .assign(podcast=transcript.parent.name)
             .assign(episode=transcript.stem)
             # for QA with sources
-            .assign(source=lambda x: x.apply(lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1))
+            .assign(
+                source=lambda x: x.apply(
+                    lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1
+                )
+            )
         )
         print(f"Ingesting transcript: {transcript.name}")
         estimate_cost_of_ingest(transcript_df)
