@@ -12,12 +12,6 @@ from transcribe import transcript_dir
 
 load_dotenv()
 transcript_col = "text"
-embedding_function = OpenAIEmbeddings(openai_api_key=os.environ["OPEN_API_KEY"])
-llm = OpenAI(openai_api_key=os.environ["OPEN_API_KEY"])
-vectordb_persist_dir = "db"
-vectordb = Chroma(
-    embedding_function=embedding_function, persist_directory=vectordb_persist_dir
-)
 merge_threshold = 2
 
 
@@ -32,11 +26,7 @@ def merge_adjacent_utterances(df):
             # Remove the next record from the dataframe
             df.drop(_, inplace=True)
         merged_records.append(row)
-    return (
-        pd.DataFrame(merged_records)
-        .drop(columns=["delta", "merge"])
-        .reset_index(drop=True)
-    )
+    return pd.DataFrame(merged_records).drop(columns=["delta", "merge"]).reset_index(drop=True)
 
 
 def parse_transcript(transcript_file):
@@ -59,20 +49,6 @@ def estimate_cost_of_ingest(transcript_df):
     print(f"Estimate ingestion cost: US ${cost_estimate}")
 
 
-def ingest_transcript_df(transcript_df):
-    # TODO: add upsert, prevent redundant writes
-    documents = DataFrameLoader(
-        transcript_df, page_content_column=transcript_col
-    ).load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-    texts = text_splitter.split_documents(documents)
-    # embed, write to chroma, save chroma db
-    # source_meta_data = transcript_df[["source"]].to_dict(orient="records")
-    vectordb.add_documents(texts)
-    # vectordb.from_texts(texts, embedding_function)
-    vectordb.persist()
-
-
 if __name__ == "__main__":
     for transcript in list(transcript_dir.rglob("*/*.csv")):
         transcript_df = (
@@ -80,11 +56,7 @@ if __name__ == "__main__":
             .assign(podcast=transcript.parent.name)
             .assign(episode=transcript.stem)
             # for QA with sources
-            .assign(
-                source=lambda x: x.apply(
-                    lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1
-                )
-            )
+            .assign(source=lambda x: x.apply(lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1))
         )
         print(f"Ingesting transcript: {transcript.name}")
         estimate_cost_of_ingest(transcript_df)
