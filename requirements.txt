@@ -7,3 +7,4 @@ tiktoken==0.4.0
 python-dotenv==1.0.0
 pinecone-client==2.2.1
 clean-py==0.5
+podcast-downloader==0.5.1
