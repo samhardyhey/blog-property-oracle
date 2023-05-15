@@ -4,10 +4,11 @@ from pathlib import Path
 import pandas as pd
 from faster_whisper import WhisperModel
 
-model_size = "tiny"
-model = WhisperModel(model_size, device="cpu", num_workers=8, compute_type="int8")
-podcast_dir = Path("./podcasts/")
-transcript_dir = Path("./transcripts/")
+model_size = "small"
+# model = WhisperModel(model_size, device="cpu", num_workers=8, compute_type="int8")
+model = WhisperModel(model_size, device="cuda", num_workers=16, compute_type="int8")
+podcast_dir = Path("./data/audio/")
+transcript_dir = Path("./data/transcripts/")
 podcasts = list(podcast_dir.rglob("*/*.mp3"))
 
 
@@ -16,10 +17,8 @@ def transcribe_audio(audio_file):
     segments, info = model.transcribe(str(audio_file), beam_size=5)
     transcript = []
     for segment in segments:
-        print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
-        transcript.append(
-            {"start": segment.start, "end": segment.end, "text": segment.text}
-        )
+        # print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
+        transcript.append({"start": segment.start, "end": segment.end, "text": segment.text})
     return pd.DataFrame(transcript)
 
 
@@ -33,10 +32,16 @@ if __name__ == "__main__":
         file_name = snake_case_string(podcast.name.replace(".mp3", ".csv"))
         save_name = transcript_dir / podcast.parent.name / file_name
 
+        if not save_name.parent.exists():
+            save_name.parent.mkdir(parents=True, exist_ok=True)
+
         if save_name.exists():
             continue
 
-        transcription = transcribe_audio(podcast)
-        transcription.to_csv(save_name, index=False)
-        end = time.time()
-        print(f"Transcribed {podcast.name} in {end - start} seconds")
+        try:
+            transcription = transcribe_audio(podcast)
+            transcription.to_csv(save_name, index=False)
+            end = time.time()
+            print(f"Transcribed {podcast.name} in {end - start} seconds")
+        except Exception:
+            print(f"Could not transcribe: {podcast.name}")

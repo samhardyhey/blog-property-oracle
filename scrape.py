@@ -73,7 +73,7 @@ def download_file(url, title, directory):
 
 
 if __name__ == "__main__":
-    podcasts = read_json("/Users/samhardyhey/.podcast_downloader_config.json")["podcasts"]
+    podcasts = read_json("./.podcast_downloader_config.json")["podcasts"]
 
     # create directories
     meta_dir = Path("./data/meta/")
@@ -99,5 +99,5 @@ if __name__ == "__main__":
 
         # parallelize the downloads
         with ThreadPoolExecutor(max_workers=12) as executor:
-            tasks = [(record.url, record.title, audio_download_dir) for idx, record in meta_df.head(10).iterrows()]
+            tasks = [(record.url, record.title, audio_download_dir) for idx, record in meta_df.iterrows()]
             list(executor.map(lambda params: download_file(*params), tasks))
