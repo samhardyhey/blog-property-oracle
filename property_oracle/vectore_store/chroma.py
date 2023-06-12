@@ -4,7 +4,7 @@ from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 
-from llm import embedding_config
+from property_oracle.llm import embedding_config
 from utils import logger
 
 CHUNK_SIZE = 1000

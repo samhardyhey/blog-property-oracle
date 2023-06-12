@@ -6,7 +6,7 @@ from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 
-from llm import embedding_config
+from property_oracle.llm import embedding_config
 
 load_dotenv()
 

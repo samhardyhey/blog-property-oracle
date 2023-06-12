@@ -26,16 +26,3 @@ def snake_case_string(s):
     s = re.sub(" +", "_", s)
 
     return s
-
-
-# def to_snake_case(s):
-#     """
-#     Converts a string to snake case.
-#     """
-#     # Replace all non-alphanumeric characters with underscores
-#     s = re.sub(r"\W", "_", s)
-
-#     # Split the string into words
-#     words = s.split()
-
-#     return "_".join(re.sub(r"__", "_", word.lower()) for word in words if word != "_")
