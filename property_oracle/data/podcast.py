@@ -1,12 +1,11 @@
-import multiprocessing
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 import requests
 
-from config import META_DIR, PODCAST_DIR
-from utils import logger, snake_case_string
+from property_oracle.config import META_DIR, PODCAST_DIR
+from property_oracle.utils import NUM_WORKERS, logger, to_snake_case
 
 PODCAST_META = [
     {
@@ -34,9 +33,6 @@ PODCAST_META = [
         "rss_link": "https://feeds.megaphone.fm/australian-property-podcast",
     },
 ]
-
-MAX_DOWNLOAD_WORKERS = 16
-NUM_CORES = multiprocessing.cpu_count()
 
 
 def etree_to_dict(t):
@@ -76,6 +72,7 @@ def format_xml_objects(xml_dict):
         .rename(columns={"enclosure": "url"})
     )
 
+
 def download_file(url, title, directory):
     try:
         response = requests.get(url)
@@ -100,25 +97,26 @@ def retrieve_podcasts():
         res = requests.get(podcast["rss_link"])
         xml_dict = parse_xml_objects(res.text)
         meta_df = format_xml_objects(xml_dict).assign(
-            title=lambda x: x.title.apply(snake_case_string)
+            title=lambda x: x.title.apply(to_snake_case)
         )
-        meta_file_save = META_DIR / f"{snake_case_string(podcast['name'])}.csv"
+        meta_file_save = META_DIR / f"{to_snake_case(podcast['name'])}.csv"
         logger.info(
             f"Saving meta data to: {meta_file_save}, found {len(meta_df)} episodes"
         )
         meta_df.to_csv(meta_file_save, index=False)
 
-        audio_download_dir = PODCAST_DIR / snake_case_string(podcast["name"])
+        audio_download_dir = PODCAST_DIR / to_snake_case(podcast["name"])
         if not audio_download_dir.exists():
             audio_download_dir.mkdir(parents=True, exist_ok=True)
 
         # parallelize the downloads
-        with ThreadPoolExecutor(max_workers=NUM_CORES) as executor:
+        with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
             tasks = [
                 (record.url, record.title, audio_download_dir)
                 for idx, record in meta_df.iterrows()
             ]
             list(executor.map(lambda params: download_file(*params), tasks))
+
 
 if __name__ == "__main__":
     retrieve_podcasts()

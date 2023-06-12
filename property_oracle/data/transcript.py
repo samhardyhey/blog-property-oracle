@@ -5,11 +5,10 @@ import pandas as pd
 import torch
 from faster_whisper import WhisperModel
 
-from config import PODCAST_DIR, TRANSCRIPT_DIR
-from utils import logger, snake_case_string
+from property_oracle.config import PODCAST_DIR, TRANSCRIPT_DIR
+from property_oracle.utils import NUM_WORKERS, logger, to_snake_case
 
 MODEL_SIZE = "small"
-NUM_WORKERS = 16
 COMPUTE_TYPE = "int8"
 
 device = "cuda" if bool(torch.cuda.is_available()) else "cpu"
@@ -27,10 +26,11 @@ def transcribe_audio(audio_file):
     ]
     return pd.DataFrame(transcript)
 
+
 def transcribe_podcasts():
     for podcast in list(PODCAST_DIR.rglob("*/*.mp3")):
         start = time.time()
-        file_name = snake_case_string(podcast.name.replace(".mp3", ".csv"))
+        file_name = to_snake_case(podcast.name.replace(".mp3", ".csv"))
         save_name = TRANSCRIPT_DIR / podcast.parent.name / file_name
 
         if not save_name.parent.exists():
@@ -46,6 +46,7 @@ def transcribe_podcasts():
             logger.info(f"Transcribed {podcast.name} in {end - start} seconds")
         except Exception:
             logger.error(f"Could not transcribe: {podcast.name}")
+
 
 if __name__ == "__main__":
     transcribe_podcasts()

@@ -1,9 +1,9 @@
 import pandas as pd
 from dotenv import load_dotenv
 
-from config import TRANSCRIPT_DIR
-from utils import logger
-from vectore_store import chroma
+from property_oracle.config import TRANSCRIPT_DIR
+from property_oracle.utils import logger
+from property_oracle.vectore_store import chroma
 
 load_dotenv()
 TRANSCRIPT_COL = "text"
@@ -33,7 +33,7 @@ def estimate_cost_of_ingest(transcript_df):
 
 if __name__ == "__main__":
     for transcript in list(TRANSCRIPT_DIR.rglob("*/*.csv")):
-        print(transcript)
+        logger.info(f"Ingesting transcript: {transcript.name}")
         df = (
             pd.read_csv(transcript)
             .assign(start=lambda x: round(x.start, 2))

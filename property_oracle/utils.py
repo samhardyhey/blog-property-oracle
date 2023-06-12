@@ -1,6 +1,6 @@
 import logging
+import multiprocessing
 import re
-import string
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,15 +14,14 @@ formatter = logging.Formatter(
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
+NUM_WORKERS = multiprocessing.cpu_count()
 
-def snake_case_string(s):
-    # Remove punctuation
-    s = s.translate(str.maketrans("", "", string.punctuation))
 
-    # Lowercase
-    s = s.lower()
+def to_snake_case(s):
+    # Replace all non-alphanumeric characters with underscores
+    s = re.sub(r"\W", "_", s)
 
-    # Replace spaces (and possibly multiple spaces) with underscores
-    s = re.sub(" +", "_", s)
+    # Split the string into words
+    words = s.split()
 
-    return s
+    return "_".join(re.sub(r"__", "_", word.lower()) for word in words if word != "_")
