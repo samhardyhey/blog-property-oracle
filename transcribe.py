@@ -15,10 +15,10 @@ podcasts = list(podcast_dir.rglob("*/*.mp3"))
 def transcribe_audio(audio_file):
     audio_file = Path(audio_file)
     segments, info = model.transcribe(str(audio_file), beam_size=5)
-    transcript = []
-    for segment in segments:
-        # print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
-        transcript.append({"start": segment.start, "end": segment.end, "text": segment.text})
+    transcript = [
+        {"start": segment.start, "end": segment.end, "text": segment.text}
+        for segment in segments
+    ]
     return pd.DataFrame(transcript)
 
 

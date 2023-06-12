@@ -6,7 +6,37 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-from srsly import read_json
+
+PODCAST_META = [
+    {
+        "name": "Your First Home Buyer Guide Podcast",
+        "rss_link": "https://www.omnycontent.com/d/playlist/3c72444b-621f-4a3e-b6e1-a82000673c2f/52a142e1-0905-48a3-9586-ac91001d6222/e3f25be2-d0d8-4aae-a501-ac91002373ff/podcast.rss",
+    },
+    {
+        "name": "My Millenial Property",
+        "rss_link": "https://feeds.acast.com/public/shows/62fa0d8926f5af001280299c",
+    },
+    {
+        "name": "Your Strata Property",
+        "rss_link": "https://www.yourstrataproperty.com.au/feed/podcast/",
+    },
+    {
+        "name": "The Home Run",
+        "rss_link": "https://omny.fm/shows/the-home-run/playlists/podcast.rss",
+    },
+    {
+        "name": "The Elephant in the Room Property Podcast",
+        "rss_link": "https://www.omnycontent.com/d/playlist/3c72444b-621f-4a3e-b6e1-a82000673c2f/469eaf17-e0b5-4a92-94c3-ad8e001a1506/92ba93e7-629e-4c65-bffa-ad8e001a151e/podcast.rss",
+    },
+    {
+        "name": "Australian Property Podcast",
+        "rss_link": "https://feeds.megaphone.fm/australian-property-podcast",
+    },
+]
+
+DATA_DIR = Path(__file__).parents[0] / "data"
+META_DIR = DATA_DIR / "meta"
+AUDIO_DIR = DATA_DIR / "audio"
 
 
 def etree_to_dict(t):
@@ -73,23 +103,21 @@ def download_file(url, title, directory):
 
 
 if __name__ == "__main__":
-    podcasts = read_json("./.podcast_downloader_config.json")["podcasts"]
+    # create output dirs
+    if not META_DIR.exists():
+        META_DIR.mkdir(parents=True, exist_ok=True)
+    if not AUDIO_DIR.exists():
+        AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
-    # create directories
-    meta_dir = Path("./data/meta/")
-    if not meta_dir.exists():
-        meta_dir.mkdir(parents=True, exist_ok=True)
-    audio_dir = Path("./data/audio/")
-    if not audio_dir.exists():
-        audio_dir.mkdir(parents=True, exist_ok=True)
-
-    for podcast in podcasts:
+    for podcast in PODCAST_META:
         # fetch/format metadata
         print(f"Retrieving XML feed for: {podcast['name']}")
         res = requests.get(podcast["rss_link"])
         xml_dict = parse_xml_objects(res.text)
-        meta_df = format_xml_objects(xml_dict).assign(title=lambda x: x.title.apply(snake_case_string))
-        meta_file_save = meta_dir / f"{snake_case_string(podcast['name'])}.csv"
+        meta_df = format_xml_objects(xml_dict).assign(
+            title=lambda x: x.title.apply(snake_case_string)
+        )
+        meta_file_save = META_DIR / f"{snake_case_string(podcast['name'])}.csv"
         print(f"Saving meta data to: {meta_file_save}, found {len(meta_df)} episodes")
         meta_df.to_csv(meta_file_save, index=False)
 
@@ -99,5 +127,8 @@ if __name__ == "__main__":
 
         # parallelize the downloads
         with ThreadPoolExecutor(max_workers=12) as executor:
-            tasks = [(record.url, record.title, audio_download_dir) for idx, record in meta_df.iterrows()]
+            tasks = [
+                (record.url, record.title, audio_download_dir)
+                for idx, record in meta_df.iterrows()
+            ]
             list(executor.map(lambda params: download_file(*params), tasks))

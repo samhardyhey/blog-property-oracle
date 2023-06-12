@@ -1,11 +1,11 @@
 import os
 
+import pinecone
 from dotenv import load_dotenv
 from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 
-import pinecone
 from llm import embedding_function
 
 load_dotenv()
