@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 from config import TRANSCRIPT_DIR
 from utils import logger
 from vectore_store import chroma
-# from vectore_store.chroma import ingest_transcript_df_chromadb
 
 load_dotenv()
 TRANSCRIPT_COL = "text"
 MERGE_THRESHOLD = 1
 ADA_COST_PER_1000_TOKENS = 0.0004
+
 
 def merge_adjacent_utterances(df):
     dff = (
@@ -47,4 +47,6 @@ if __name__ == "__main__":
         )
         logger.info(f"Ingesting transcript: {transcript.name}")
         estimate_cost_of_ingest(transcript_df)
-        chroma.ingest_transcript_df_chromadb(transcript_df, transcript_col=TRANSCRIPT_COL)
+        chroma.ingest_transcript_df_chromadb(
+            transcript_df, transcript_col=TRANSCRIPT_COL
+        )

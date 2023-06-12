@@ -1,13 +1,12 @@
 import multiprocessing
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 
 import pandas as pd
 import requests
 
-from utils import logger, snake_case_string
 from config import META_DIR, PODCAST_DIR
+from utils import logger, snake_case_string
 
 PODCAST_META = [
     {

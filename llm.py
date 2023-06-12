@@ -18,5 +18,5 @@ questions = [
     "What is the general effect of a recession on house prices? Is this a good time to buy?",
     "What are some important differences between on and off-market properties?",
     "What are some ways we can address the housing crisis in Australia?",
-    "Can you write me a to-do list for first home buyer?"
+    "Can you write me a to-do list for first home buyer?",
 ]

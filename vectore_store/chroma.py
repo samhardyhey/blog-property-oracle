@@ -3,9 +3,9 @@ from pathlib import Path
 from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from utils import logger
 
 from llm import embedding_config
+from utils import logger
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 100
@@ -25,6 +25,8 @@ def ingest_transcript_df_chromadb(transcript_df, transcript_col):
         chunk_size=CHUNK_SIZE, chunk_overlap=0
     )
     texts = text_splitter.split_documents(documents)
-    logger.info(f"Supplied {len(transcript_df)} records, ingesting as {len(texts)} documents")
+    logger.info(
+        f"Supplied {len(transcript_df)} records, ingesting as {len(texts)} documents"
+    )
     vectordb.add_documents(texts)
     vectordb.persist()

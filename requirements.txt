@@ -9,3 +9,4 @@ pinecone-client==2.2.1
 clean-py==0.5
 lxml==4.9.2
 srsly==2.4.6
+typer==0.7.0
