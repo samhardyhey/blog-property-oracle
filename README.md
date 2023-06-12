@@ -38,4 +38,6 @@ aws s3api create-bucket --bucket blog-property-oracle --region ap-southeast-2 --
 
 aws s3 sync ./data s3://blog-property-oracle/data
 
+aws s3 sync s3://blog-property-oracle/data/transcripts/australian_property_podcast ./data/transcripts/australian_property_podcast
+
 aws configure set default.s3.max_concurrent_requests 100

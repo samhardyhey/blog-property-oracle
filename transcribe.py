@@ -2,14 +2,23 @@ import time
 from pathlib import Path
 
 import pandas as pd
+import torch
 from faster_whisper import WhisperModel
 
-model_size = "small"
-# model = WhisperModel(model_size, device="cpu", num_workers=8, compute_type="int8")
-model = WhisperModel(model_size, device="cuda", num_workers=16, compute_type="int8")
-podcast_dir = Path("./data/audio/")
-transcript_dir = Path("./data/transcripts/")
-podcasts = list(podcast_dir.rglob("*/*.mp3"))
+from utils import logger
+
+MODEL_SIZE = "small"
+NUM_WORKERS = 16
+COMPUTE_TYPE = "int8"
+DATA_DIR = Path(__file__).parents[0] / "data"
+PODCAST_DIR = DATA_DIR / "audio"
+TRANSCRIPT_DIR = DATA_DIR / "transcripts"
+
+device = "cuda" if bool(torch.cuda.is_available()) else "cpu"
+podcasts = list(PODCAST_DIR.rglob("*/*.mp3"))
+model = WhisperModel(
+    MODEL_SIZE, device=device, num_workers=NUM_WORKERS, compute_type=COMPUTE_TYPE
+)
 
 
 def transcribe_audio(audio_file):
@@ -30,7 +39,7 @@ if __name__ == "__main__":
     for podcast in podcasts:
         start = time.time()
         file_name = snake_case_string(podcast.name.replace(".mp3", ".csv"))
-        save_name = transcript_dir / podcast.parent.name / file_name
+        save_name = TRANSCRIPT_DIR / podcast.parent.name / file_name
 
         if not save_name.parent.exists():
             save_name.parent.mkdir(parents=True, exist_ok=True)
@@ -42,6 +51,6 @@ if __name__ == "__main__":
             transcription = transcribe_audio(podcast)
             transcription.to_csv(save_name, index=False)
             end = time.time()
-            print(f"Transcribed {podcast.name} in {end - start} seconds")
+            logger.info(f"Transcribed {podcast.name} in {end - start} seconds")
         except Exception:
-            print(f"Could not transcribe: {podcast.name}")
+            logger.error(f"Could not transcribe: {podcast.name}")

@@ -1,11 +1,12 @@
-import re
-import string
+import multiprocessing
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
 import requests
+
+from utils import logger, snake_case_string
 
 PODCAST_META = [
     {
@@ -37,6 +38,8 @@ PODCAST_META = [
 DATA_DIR = Path(__file__).parents[0] / "data"
 META_DIR = DATA_DIR / "meta"
 AUDIO_DIR = DATA_DIR / "audio"
+MAX_DOWNLOAD_WORKERS = 16
+NUM_CORES = multiprocessing.cpu_count()
 
 
 def etree_to_dict(t):
@@ -77,19 +80,6 @@ def format_xml_objects(xml_dict):
     )
 
 
-def snake_case_string(s):
-    # Remove punctuation
-    s = s.translate(str.maketrans("", "", string.punctuation))
-
-    # Lowercase
-    s = s.lower()
-
-    # Replace spaces (and possibly multiple spaces) with underscores
-    s = re.sub(" +", "_", s)
-
-    return s
-
-
 # Function to download one file
 def download_file(url, title, directory):
     try:
@@ -97,9 +87,9 @@ def download_file(url, title, directory):
         file_path = directory / f"{title}.mp3"
         with open(str(file_path), "wb") as f:
             f.write(response.content)
-        print(f"Successfully downloaded {url}")
+        logger.info(f"Successfully downloaded {url}")
     except Exception:
-        print(f"Error downloading {url}")
+        logger.warning(f"Error downloading {url}")
 
 
 if __name__ == "__main__":
@@ -111,22 +101,24 @@ if __name__ == "__main__":
 
     for podcast in PODCAST_META:
         # fetch/format metadata
-        print(f"Retrieving XML feed for: {podcast['name']}")
+        logger.info(f"Retrieving XML feed for: {podcast['name']}")
         res = requests.get(podcast["rss_link"])
         xml_dict = parse_xml_objects(res.text)
         meta_df = format_xml_objects(xml_dict).assign(
             title=lambda x: x.title.apply(snake_case_string)
         )
         meta_file_save = META_DIR / f"{snake_case_string(podcast['name'])}.csv"
-        print(f"Saving meta data to: {meta_file_save}, found {len(meta_df)} episodes")
+        logger.info(
+            f"Saving meta data to: {meta_file_save}, found {len(meta_df)} episodes"
+        )
         meta_df.to_csv(meta_file_save, index=False)
 
-        audio_download_dir = Path("./data/audio") / snake_case_string(podcast["name"])
+        audio_download_dir = AUDIO_DIR / snake_case_string(podcast["name"])
         if not audio_download_dir.exists():
             audio_download_dir.mkdir(parents=True, exist_ok=True)
 
         # parallelize the downloads
-        with ThreadPoolExecutor(max_workers=12) as executor:
+        with ThreadPoolExecutor(max_workers=NUM_CORES) as executor:
             tasks = [
                 (record.url, record.title, audio_download_dir)
                 for idx, record in meta_df.iterrows()

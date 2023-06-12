@@ -1,7 +1,7 @@
 import pandas as pd
 from dotenv import load_dotenv
 
-from transcribe import transcript_dir
+from transcribe import TRANSCRIPT_DIR
 
 load_dotenv()
 transcript_col = "text"
@@ -47,7 +47,7 @@ def estimate_cost_of_ingest(transcript_df):
 
 
 if __name__ == "__main__":
-    for transcript in list(transcript_dir.rglob("*/*.csv")):
+    for transcript in list(TRANSCRIPT_DIR.rglob("*/*.csv")):
         transcript_df = (
             parse_transcript(transcript)
             .assign(podcast=transcript.parent.name)
