@@ -76,8 +76,6 @@ def format_xml_objects(xml_dict):
         .rename(columns={"enclosure": "url"})
     )
 
-
-# Function to download one file
 def download_file(url, title, directory):
     try:
         response = requests.get(url)

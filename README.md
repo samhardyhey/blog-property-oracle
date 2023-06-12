@@ -3,7 +3,7 @@ Notebooks and scripts for the:
 
 - Retrieval of Podcasts, naturally focused on Australian Property
 - Transcribing of podcasts
-- Ingesting transcripts into a vector store (chroma by default)
+- Ingesting podcast transcripts into a vector store (chroma by default)
 - Small/basic chat application for interacting with the vector store
 
 See the accompanying blog post [here](https://www.samhardyhey.com/).
