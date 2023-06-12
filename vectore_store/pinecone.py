@@ -6,7 +6,7 @@ from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 
-from llm import embedding_function
+from llm import embedding_config
 
 load_dotenv()
 
@@ -23,7 +23,7 @@ if index_name not in pinecone.list_indexes():
 
 pinecone_index = pinecone.Index(index_name)
 pinecone_vector_db = Pinecone.from_existing_index(
-    index_name, embedding=embedding_function, text_key="text"
+    index_name, embedding=embedding_config, text_key="text"
 )
 
 

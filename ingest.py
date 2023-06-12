@@ -1,64 +1,50 @@
 import pandas as pd
 from dotenv import load_dotenv
 
-from transcribe import TRANSCRIPT_DIR
+from config import TRANSCRIPT_DIR
+from utils import logger
+from vectore_store import chroma
+# from vectore_store.chroma import ingest_transcript_df_chromadb
 
 load_dotenv()
-transcript_col = "text"
-merge_threshold = 2
-
+TRANSCRIPT_COL = "text"
+MERGE_THRESHOLD = 1
+ADA_COST_PER_1000_TOKENS = 0.0004
 
 def merge_adjacent_utterances(df):
-    # Merge records
-    merged_records = []
-    for _, row in df.iterrows():
-        if row["merge"]:
-            # Merge text with the next recordb
-            row["text"] += df.loc[_, "text"]
-            row["end"] = df.loc[_, "end"]
-            # Remove the next record from the dataframe
-            df.drop(_, inplace=True)
-        merged_records.append(row)
-    return (
-        pd.DataFrame(merged_records)
-        .drop(columns=["delta", "merge"])
+    dff = (
+        df.assign(start_shift=lambda x: x.start.shift(-1))
+        .assign(delta=lambda x: x.start_shift - x.end)
+        .assign(group=lambda x: (x.delta > MERGE_THRESHOLD).cumsum())
+        .groupby("group")
+        .agg({"start": "min", "end": "max", "text": "".join})
         .reset_index(drop=True)
     )
-
-
-def parse_transcript(transcript_file):
-    dff = (
-        pd.read_csv(transcript_file)
-        # round, calculate deltas
-        .assign(start=lambda x: round(x.start, 2))
-        .assign(end=lambda x: round(x.end, 2))
-        .assign(delta=lambda x: x.start.shift(-1) - x.end)
-        .assign(merge=lambda x: x.delta > merge_threshold)
-    )
-    return merge_adjacent_utterances(dff)
+    logger.info(f"Reducing {len(df)} records to {len(dff)}")
+    return dff
 
 
 def estimate_cost_of_ingest(transcript_df):
-    ada_cost_per_1000_tokens = 0.0004
     n_tokens = len([e for e in "".join(transcript_df.text.tolist()).split(" ") if e])
-    print(f"{n_tokens} tokens found in transcript")
-    cost_estimate = (n_tokens / 1000) * ada_cost_per_1000_tokens
-    print(f"Estimate ingestion cost: US ${cost_estimate}")
+    logger.info(f"{n_tokens} tokens found in transcript")
+    cost_estimate = (n_tokens / 1000) * ADA_COST_PER_1000_TOKENS
+    logger.info(f"Estimate ingestion cost: US ${cost_estimate}")
 
 
 if __name__ == "__main__":
     for transcript in list(TRANSCRIPT_DIR.rglob("*/*.csv")):
+        print(transcript)
+        df = (
+            pd.read_csv(transcript)
+            .assign(start=lambda x: round(x.start, 2))
+            .assign(end=lambda x: round(x.end, 2))
+            .sort_values(["start", "end"])
+        )
         transcript_df = (
-            parse_transcript(transcript)
+            merge_adjacent_utterances(df)
             .assign(podcast=transcript.parent.name)
             .assign(episode=transcript.stem)
-            # for QA with sources
-            .assign(
-                source=lambda x: x.apply(
-                    lambda y: f"{y.podcast} | {y.episode} | {y.start} | {y.end}", axis=1
-                )
-            )
         )
-        print(f"Ingesting transcript: {transcript.name}")
+        logger.info(f"Ingesting transcript: {transcript.name}")
         estimate_cost_of_ingest(transcript_df)
-        ingest_transcript_df(transcript_df)
+        chroma.ingest_transcript_df_chromadb(transcript_df, transcript_col=TRANSCRIPT_COL)

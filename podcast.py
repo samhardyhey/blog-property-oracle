@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 
 from utils import logger, snake_case_string
+from config import META_DIR, PODCAST_DIR
 
 PODCAST_META = [
     {
@@ -35,9 +36,6 @@ PODCAST_META = [
     },
 ]
 
-DATA_DIR = Path(__file__).parents[0] / "data"
-META_DIR = DATA_DIR / "meta"
-AUDIO_DIR = DATA_DIR / "audio"
 MAX_DOWNLOAD_WORKERS = 16
 NUM_CORES = multiprocessing.cpu_count()
 
@@ -96,8 +94,8 @@ if __name__ == "__main__":
     # create output dirs
     if not META_DIR.exists():
         META_DIR.mkdir(parents=True, exist_ok=True)
-    if not AUDIO_DIR.exists():
-        AUDIO_DIR.mkdir(parents=True, exist_ok=True)
+    if not PODCAST_DIR.exists():
+        PODCAST_DIR.mkdir(parents=True, exist_ok=True)
 
     for podcast in PODCAST_META:
         # fetch/format metadata
@@ -113,7 +111,7 @@ if __name__ == "__main__":
         )
         meta_df.to_csv(meta_file_save, index=False)
 
-        audio_download_dir = AUDIO_DIR / snake_case_string(podcast["name"])
+        audio_download_dir = PODCAST_DIR / snake_case_string(podcast["name"])
         if not audio_download_dir.exists():
             audio_download_dir.mkdir(parents=True, exist_ok=True)
 

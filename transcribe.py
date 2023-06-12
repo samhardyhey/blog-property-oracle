@@ -5,14 +5,12 @@ import pandas as pd
 import torch
 from faster_whisper import WhisperModel
 
+from config import PODCAST_DIR, TRANSCRIPT_DIR
 from utils import logger
 
 MODEL_SIZE = "small"
 NUM_WORKERS = 16
 COMPUTE_TYPE = "int8"
-DATA_DIR = Path(__file__).parents[0] / "data"
-PODCAST_DIR = DATA_DIR / "audio"
-TRANSCRIPT_DIR = DATA_DIR / "transcripts"
 
 device = "cuda" if bool(torch.cuda.is_available()) else "cpu"
 podcasts = list(PODCAST_DIR.rglob("*/*.mp3"))
