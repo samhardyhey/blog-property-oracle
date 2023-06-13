@@ -31,7 +31,7 @@ def estimate_cost_of_ingest(transcript_df):
     logger.info(f"Estimate ingestion cost: US ${cost_estimate}")
 
 
-if __name__ == "__main__":
+def ingest_transcripts():
     for transcript in list(TRANSCRIPT_DIR.rglob("*/*.csv")):
         logger.info(f"Ingesting transcript: {transcript.name}")
         df = (
@@ -50,3 +50,7 @@ if __name__ == "__main__":
         chroma.ingest_transcript_df_chromadb(
             transcript_df, transcript_col=TRANSCRIPT_COL
         )
+
+
+if __name__ == "__main__":
+    ingest_transcripts()
