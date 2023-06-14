@@ -3,7 +3,7 @@ transcripts/
 podcasts/
 *.mp3
 *.csv
-./data
+data/
 .env
 *.pyc
 __pycache__/

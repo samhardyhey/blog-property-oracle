@@ -31,7 +31,7 @@ def main():
         llm, vectordb.as_retriever(), memory=memory
     )
     while True:
-        question = typer.prompt(typer.style("\nYou ", fg=typer.colors.BRIGHT_GREEN))
+        question = typer.prompt(typer.style("\nYou", fg=typer.colors.BRIGHT_GREEN))
 
         if question.lower() == "exit":
             typer.echo(
@@ -53,8 +53,9 @@ def main():
 
         result = qa({"question": question})
         typer.echo(
-            typer.style(f"\nProperty Oracle:{result['answer']}"),
+            typer.style(f"\nProperty Oracle:{result['answer']}",
             fg=typer.colors.BRIGHT_YELLOW,
+            )
         )
 
 

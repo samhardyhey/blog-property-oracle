@@ -4,11 +4,14 @@ from dotenv import load_dotenv
 from property_oracle.config import TRANSCRIPT_DIR
 from property_oracle.utils import logger
 from property_oracle.vectore_store import chroma
+import random
 
 load_dotenv()
 TRANSCRIPT_COL = "text"
 MERGE_THRESHOLD = 1
 ADA_COST_PER_1000_TOKENS = 0.0004
+SHUFFLE_SAMPLE = True
+SAMPLE_SIZE = 50
 
 
 def merge_adjacent_utterances(df):
@@ -20,7 +23,7 @@ def merge_adjacent_utterances(df):
         .agg({"start": "min", "end": "max", "text": "".join})
         .reset_index(drop=True)
     )
-    logger.info(f"Reducing {len(df)} records to {len(dff)}")
+    logger.info(f"Reducing {len(df)} records to {len(dff)} records")
     return dff
 
 
@@ -32,7 +35,13 @@ def estimate_cost_of_ingest(transcript_df):
 
 
 def ingest_transcripts():
-    for transcript in list(TRANSCRIPT_DIR.rglob("*/*.csv")):
+    transcripts = list(TRANSCRIPT_DIR.rglob("*/*.csv"))
+    if SHUFFLE_SAMPLE:
+        logger.info(f"Shuffling {len(transcripts)} and sampling {SAMPLE_SIZE}")
+        random.shuffle(transcripts)
+        transcripts = transcripts[:SAMPLE_SIZE]
+
+    for transcript in transcripts:
         logger.info(f"Ingesting transcript: {transcript.name}")
         df = (
             pd.read_csv(transcript)
