@@ -1,10 +1,11 @@
+import random
+
 import pandas as pd
 from dotenv import load_dotenv
 
 from property_oracle.config import TRANSCRIPT_DIR
 from property_oracle.utils import logger
 from property_oracle.vectore_store import chroma
-import random
 
 load_dotenv()
 TRANSCRIPT_COL = "text"

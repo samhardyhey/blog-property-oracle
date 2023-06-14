@@ -53,8 +53,9 @@ def main():
 
         result = qa({"question": question})
         typer.echo(
-            typer.style(f"\nProperty Oracle:{result['answer']}",
-            fg=typer.colors.BRIGHT_YELLOW,
+            typer.style(
+                f"\nProperty Oracle:{result['answer']}",
+                fg=typer.colors.BRIGHT_YELLOW,
             )
         )
 

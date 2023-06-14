@@ -6,7 +6,7 @@ Notebooks and scripts for the:
 - Ingesting podcast transcripts into a vector store (chroma by default)
 - Small/basic chat application for interacting with the vector store
 
-See the accompanying blog post [here](https://www.samhardyhey.com/).
+See the accompanying blog post [here](https://www.samhardyhey.com/property-oracle).
 
 ## Install
 - via `scripts/create_env.sh`
