@@ -2,10 +2,10 @@ import os
 
 import pinecone
 from dotenv import load_dotenv
+
 from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
-
 from property_oracle.llm import embedding_config
 
 load_dotenv()

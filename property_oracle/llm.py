@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms import OpenAI
 

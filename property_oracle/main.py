@@ -1,9 +1,9 @@
 import os
 
 import typer
+
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-
 from property_oracle.llm import example_questions, llm
 from vectore_store.chroma import vectordb
 

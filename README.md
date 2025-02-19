@@ -1,20 +1,38 @@
-## Blog Property Oracle
-Notebooks and scripts for the:
+# Property Oracle 🏠
 
-- Retrieval of Podcasts, naturally focused on Australian Property
-- Transcribing of podcasts
-- Ingesting podcast transcripts into a vector store (chroma by default)
-- Small/basic chat application for interacting with the vector store
+AI-powered chat interface for Australian property insights using podcast transcripts. Companion code for ["Property Oracle"](https://www.samhardyhey.com/property-oracle).
 
-See the accompanying blog post [here](https://www.samhardyhey.com/property-oracle).
+## Features
+- 🎙️ Property podcast collection
+- 📝 Audio transcription
+- 🧠 Vector store integration
+- 💬 Interactive chat interface
 
-## Install
-- via `scripts/create_env.sh`
+## Setup
+```bash
+# Install dependencies
+./scripts/create_env.sh
+```
 
 ## Usage
-- **Podcast retrieval.** Via `python property_oracle/data/podcast.py`
-- **Podcast transcription.** Via ``python property_oracle/data/transcript.py``
-- **Transcript ingestion.** Via ``python property_oracle/data/ingest.py``
-- **Property Oracle Chat.** Via ``python property_oracle/main.py``
+```bash
+# Download property podcasts
+python property_oracle/data/podcast.py
 
-All code obviously dependant upon configuring an openAI API key and some decent hardware to transcribe the podcasts with.
+# Generate transcripts
+python property_oracle/data/transcript.py
+
+# Build vector store
+python property_oracle/data/ingest.py
+
+# Launch chat interface
+python property_oracle/main.py
+```
+
+## Structure
+- 🎧 `data/podcast.py` # Podcast retrieval
+- 📄 `data/transcript.py` # Transcription
+- 💾 `data/ingest.py` # Vector store creation
+- 🤖 `main.py` # Chat application
+
+*Note: Requires OpenAI API key and sufficient compute for transcription.*

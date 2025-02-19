@@ -1,7 +1,6 @@
 from langchain.document_loaders import DataFrameLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-
 from property_oracle.config import DATA_DIR
 from property_oracle.llm import embedding_config
 from property_oracle.utils import logger
